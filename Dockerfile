@@ -55,7 +55,7 @@ RUN conda update --quiet \
   bokeh \
   h5py \
   scikit-image \
-  scikit-learn \  
+  scikit-learn
 RUN conda install --quiet libgfortran
 
 # Custom font
