@@ -33,10 +33,15 @@ RUN apt-get update && apt-get install -y \
 
 # GPU support
 RUN cd /opt && \
-  wget https://developer.nvidia.com/compute/cuda/8.0/prod/local_installers/cuda_8.0.44_linux-run && \
-  mkdir nvidia_installers && chmod +x cuda_8.0.44_linux-run && \
-  ./cuda_8.0.44_linux-run --extract=`pwd`/nvidia_installers && cd nvidia_installers && \
-  ./NVIDIA-Linux-x86_64-367.48.run -s -N --no-kernel-module && ./cuda-linux64-rel-8.0.44-21122537.run -noprompt 
+  wget --no-verbose https://developer.nvidia.com/compute/cuda/8.0/prod/local_installers/cuda_8.0.44_linux-run && \
+  mkdir nvidia_installers && \
+  chmod +x cuda_8.0.44_linux-run && \
+  ./cuda_8.0.44_linux-run --extract=`pwd`/nvidia_installers && \
+  cd nvidia_installers && \
+  ./NVIDIA-Linux-x86_64-367.48.run -s -N --no-kernel-module && \
+  ./cuda-linux64-rel-8.0.44-21122537.run -noprompt && \
+  rm -f ../cuda_8.0.44_linux-run && \
+  rm -f *.run
 
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda-8.0/lib64
 ENV PATH=$PATH:/usr/local/cuda-8.0/bin
@@ -44,14 +49,20 @@ RUN ldconfig
 
 # Conda updates
 RUN printf "[samplerate]\nlibrary_dirs=/usr/lib/x86_64-linux-gnu/\ninclude_dirs=/usr/include/" >> ~/.numpy-site.cfg && \
-        printf "\n[sndfile]\nlibrary_dirs=/usr/lib/x86_64-linux-gnu/\ninclude_dirs=/usr/include/" >> ~/.numpy-site.cfg
+  printf "\n[sndfile]\nlibrary_dirs=/usr/lib/x86_64-linux-gnu/\ninclude_dirs=/usr/include/" >> ~/.numpy-site.cfg
 
-RUN conda update scikit-learn bokeh scikit-image h5py
-RUN conda install libgfortran
+RUN conda update --quiet \
+  bokeh \
+  h5py \
+  scikit-image \
+  scikit-learn \  
+RUN conda install --quiet libgfortran
 
 # Custom font
-RUN cd /usr/share/fonts && wget "https://github.com/google/fonts/raw/master/ofl/ptsans/PT_Sans-Web-Regular.ttf" && \
-  fc-cache -fv && rm -f /root/.cache/matplotlib/fontList*
+RUN cd /usr/share/fonts && \
+  wget --no-verbose "https://github.com/google/fonts/raw/master/ofl/ptsans/PT_Sans-Web-Regular.ttf" && \
+  fc-cache -fv && \
+  rm -f /root/.cache/matplotlib/fontList*
 
 
 USER jovyan
@@ -98,12 +109,16 @@ RUN pip install \
   
 # Theano
 ENV THEANO_FLAGS=floatX=float32,device=gpu0
-RUN cd /home/jovyan && git clone git://github.com/Theano/Theano.git
-RUN cd /home/jovyan/Theano && /opt/conda/bin/python setup.py develop
+RUN cd /home/jovyan && \
+  git clone git://github.com/Theano/Theano.git && \
+  cd /home/jovyan/Theano && \
+  /opt/conda/bin/python setup.py develop
 
 # pylearn2
-RUN cd /home/jovyan && git clone git://github.com/lisa-lab/pylearn2.git
-RUN cd /home/jovyan/pylearn2 && /opt/conda/bin/python setup.py develop
+RUN cd /home/jovyan && \
+  git clone git://github.com/lisa-lab/pylearn2.git && \
+  cd /home/jovyan/pylearn2 && \
+  /opt/conda/bin/python setup.py develop
 ENV PYLEARN2_DATA_PATH=/opt/data
 
 # TensorFlow
