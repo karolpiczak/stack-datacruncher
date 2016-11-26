@@ -72,6 +72,7 @@ RUN pip install --upgrade -I setuptools
 
 RUN pip install \
   boto \
+  coverage==3.7.1 \
   descartes \
   GitPython \
   googlemaps \
@@ -88,6 +89,7 @@ RUN pip install \
   nose \
   objgraph \
   openpyxl \
+  pep8 \
   prettyplotlib \
   psutil \
   PyAudio==0.2.8 \
@@ -95,6 +97,11 @@ RUN pip install \
   https://github.com/karoldvl/fork-pydub/archive/quick-fix.zip \
   pympler \
   pysal \
+  pytest \
+  pytest-cov \
+  pytest-pep8 \
+  pytest-xdist \
+  python-coveralls \
   PyYAML \
   quandl \
   scikit-image \
